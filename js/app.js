@@ -13,6 +13,11 @@ const app = {
     },
     startTimer() {
         this.timerID = setInterval(() => {
+            if(this.timer % 5 == 2) {
+                const x = Math.floor(Math.random() * 980) + 10;
+                const y = Math.floor(Math.random() * 780) + 10;
+                this.createZombie(x, y);
+            }
             this.timer++;
         }, 1000);
     },
@@ -47,6 +52,7 @@ const app = {
         app.ctx.fillText(`Time to Daylight: ${app.timer}`, 700, 30)
         for (player of app.players) {
             app.spawnUnit(player);
+            player.move();
         }
         for (zombie of app.zombies) {
             app.spawnUnit(zombie);
@@ -62,12 +68,29 @@ const app = {
 
 document.addEventListener('keydown', (event) => {
     if (event.keyCode == 39) {
-        console.log('right');
+        app.players[0].direction.x = 1;
     } else if (event.keyCode == 37) {
-        console.log('left');
+        app.players[0].direction.x = -1;
     } else if (event.keyCode == 38) {
-        console.log('up');
+        app.players[0].direction.y = -1;
     } else if (event.keyCode ==40 ) {
-        console.log('down');
+        app.players[0].direction.y = 1;
     }
 })
+document.addEventListener('keyup', (event) => {
+    if (event.keyCode == 39) {
+        app.players[0].direction.x = 0;
+    } else if (event.keyCode == 37) {
+        app.players[0].direction.x = 0;
+    } else if (event.keyCode == 38) {
+        app.players[0].direction.y = 0;
+    } else if (event.keyCode ==40 ) {
+        app.players[0].direction.y = 0;
+    }
+})
+
+
+// app.initializePlayer();
+// app.createCanvas();
+// app.startTimer();
+// app.animate();
