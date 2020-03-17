@@ -8,15 +8,12 @@ const app = {
     positions: [],
 
     initializePlayer() {
-        const player = new Player(400, 400, 8, 10);
+        const player = new Player(400, 400, 2, 10);
         this.players.push(player);
-        this.spawnUnit(player);
     },
     startTimer() {
         this.timerID = setInterval(() => {
-            
             this.timer++;
-            
         }, 1000);
     },
     createCanvas() {
@@ -32,6 +29,10 @@ const app = {
     clearCanvas() {
         app.ctx.clearRect(0, 0, 1000, 800);
     },
+    createZombie(x, y) {
+        const zombie = new Zombie(x, y, 0.5, 10);
+        this.zombies.push(zombie);
+    },
     spawnUnit(unit) {
         this.ctx.beginPath();
         this.ctx.arc(unit.x, unit.y, unit.radius, 0, 2 * Math.PI);
@@ -40,14 +41,18 @@ const app = {
     },
     animate() {
         app.clearCanvas();
+        app.ctx.beginPath();
         app.ctx.font = '30px serif';
+        app.ctx.fillStyle = '#ffffff'
         app.ctx.fillText(`Time to Daylight: ${app.timer}`, 700, 30)
-        // for (player of this.players) {
-        //     this.spawnUnit(player);
-        // }
-        // for (zombie of this.zombies) {
-        //     this.spawnUnit(zombie);
-        // }
+        for (player of app.players) {
+            app.spawnUnit(player);
+        }
+        for (zombie of app.zombies) {
+            app.spawnUnit(zombie);
+            zombie.getDirection(app.players[0]);
+            zombie.move()
+        }
         // for (citizen of this.citizens) {
         //     this.spawnUnit(citizen);
         // }

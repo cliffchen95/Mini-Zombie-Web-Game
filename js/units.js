@@ -1,10 +1,5 @@
 class Unit {
-  direction = {
-    up: false,
-    down: false,
-    left: false,
-    right: false
-  }
+  direction = { x: 0, y: 0 }
   constructor(x, y, speed, radius) {
     this.x = x;
     this.y = y;
@@ -12,34 +7,20 @@ class Unit {
     this.radius = radius;
   }
   move() {
-    if (this.direction.up) this.y -= this.speed;
-    if (this.direction.left) this.x -= this.speed;
-    if (this.direction.right) this.x += this.speed;
-    if (this.direction.down) this.y += this.speed;
+    this.x += this.speed * this.direction.x;
+    this.y += this.speed * this.direction.y;
   }
-  setDirection(key) {
-    if(key == 'w') this.direction.up = true;
-    if(key == 'a') this.direction.left = true;
-    if(key == 's') this.direction.down = true;
-    if(key == 'd') this.direction.right = true;
-  }
-  unsetDirection(key) {
-    if(key == 'w') this.direction.up = false;
-    if(key == 'a') this.direction.left = false;
-    if(key == 's') this.direction.down = false;
-    if(key == 'd') this.direction.right = false;
-  }
+
   checkCollision(unit) { // note this is designed to check for coll w/ other RECTs specifically
-    if(
+    if (
       this.x + this.radius > unit.x &&
-      this.x < unit.x + unit.radius && 
+      this.x < unit.x + unit.radius &&
       this.y + this.radius > unit.y &&
-      this.y < unit.y +unit.radius
+      this.y < unit.y + unit.radius
     ) {
       console.log('collision');
       return true
-    }  
-    else return false
+    } else return false
   }
 }
 
@@ -54,8 +35,27 @@ class Citizen extends Unit {
 
 class Zombie extends Unit {
   color = 'red';
+  getDirection(unit) {
+    const x = unit.x - this.x;
+    const y = unit.y - this.y;
+    const distance = Math.sqrt(x**2 + y**2);
+    this.direction.x = x/distance;
+    this.direction.y = y/distance;
+  }
 }
 
 class Player extends Unit {
   color = 'yellow'
+  setDirection(key) {
+    if (key == 'w') this.direction.y = -1;
+    if (key == 'a') this.direction.x = -1;
+    if (key == 's') this.direction.y = 1;
+    if (key == 'd') this.direction.x = 1;
+  }
+  unsetDirection(key) {
+    if (key == 'w') this.direction.y = 0;
+    if (key == 'a') this.direction.x = 0;
+    if (key == 's') this.direction.y = 0;
+    if (key == 'd') this.direction.x = 0;
+  }
 }
