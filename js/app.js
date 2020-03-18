@@ -42,7 +42,7 @@ const app = {
     this.zombies.push(zombie);
   },
   createCitizen(x, y) {
-    const citizen = new Citizen(x, y, 0.3, 10);
+    const citizen = new Citizen(x, y, 0.4, 10);
     this.citizens.push(citizen);
   },
   spawnUnit(unit) {
@@ -61,12 +61,21 @@ const app = {
       }
     }
     for (citizen of this.citizens) {
-      if(distance > zombie.getDistance(citizen)) {
+      if (distance > zombie.getDistance(citizen)) {
         distance = zombie.getDirection(citizen);
         unit = citizen;
       }
     }
     return unit;
+  },
+  citizenAttacked(zombie) {
+    for (let i = 0; i < this.citizens.length; i++) {
+      if (zombie.checkCollision(this.citizens[i])) {
+        this.zombies.push(this.citizens[i].turnIntoZombie());
+        this.citizens.splice(i, 1);
+        return;
+      }
+    }
   },
   animate() {
     app.clearCanvas();
@@ -81,10 +90,13 @@ const app = {
     for (zombie of app.zombies) {
       app.spawnUnit(zombie);
       zombie.getDirection(app.getClosestUnit(zombie));
-      zombie.move()
+      zombie.move();
+      app.citizenAttacked(zombie);
     }
     for (citizen of app.citizens) {
-        app.spawnUnit(citizen);
+      app.spawnUnit(citizen);
+      citizen.setDirection();
+      citizen.move();
     }
     window.requestAnimationFrame(app.animate);
   }
