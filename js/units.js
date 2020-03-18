@@ -35,27 +35,20 @@ class Citizen extends Unit {
 
 class Zombie extends Unit {
   color = 'red';
+  getDistance(unit) {
+    const x = unit.x - this.x;
+    const y = unit.y - this.y;
+    return Math.sqrt(x ** 2 + y ** 2);
+  }
   getDirection(unit) {
     const x = unit.x - this.x;
     const y = unit.y - this.y;
-    const distance = Math.sqrt(x**2 + y**2);
-    this.direction.x = x/distance;
-    this.direction.y = y/distance;
+    const distance = Math.sqrt(x ** 2 + y ** 2);
+    this.direction.x = x / distance;
+    this.direction.y = y / distance;
   }
 }
 
 class Player extends Unit {
   color = 'yellow'
-  setDirection(key) {
-    if (key == 'w') this.direction.y = -1;
-    if (key == 'a') this.direction.x = -1;
-    if (key == 's') this.direction.y = 1;
-    if (key == 'd') this.direction.x = 1;
-  }
-  unsetDirection(key) {
-    if (key == 'w') this.direction.y = 0;
-    if (key == 'a') this.direction.x = 0;
-    if (key == 's') this.direction.y = 0;
-    if (key == 'd') this.direction.x = 0;
-  }
 }
