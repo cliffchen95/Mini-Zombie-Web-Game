@@ -7,8 +7,12 @@ class Unit {
     this.radius = radius;
   }
   move() {
-    this.x += this.speed * this.direction.x;
-    this.y += this.speed * this.direction.y;
+    if (this.x + this.speed * this.direction.x >= 10 && this.x + this.speed * this.direction.x <= 990) {
+      this.x += this.speed * this.direction.x;
+    }
+    if (this.y + this.speed * this.direction.y >= 10 && this.y + this.speed * this.direction.y <= 790) {
+      this.y += this.speed * this.direction.y;
+    }
   }
 }
 
@@ -19,9 +23,19 @@ class Citizen extends Unit {
     const zombie = new Zombie(this.x, this.y, 0.6, 10);
     return zombie;
   }
-  setDirection() {
-    this.direction.x = (Math.random() - 0.5) * 1.2;
-    this.direction.y = (Math.random() - 0.5) * 1.2;
+  getDistance(unit) {
+    const x = unit.x - this.x;
+    const y = unit.y - this.y;
+    return Math.sqrt(x ** 2 + y ** 2);
+  }
+  setDirection(unit) {
+    if (unit !== null) {
+      const x = unit.x - this.x;
+      const y = unit.y - this.y;
+      const distance = this.getDistance(unit)
+      this.direction.x = -x / distance;
+      this.direction.y = -y / distance;
+    }
   }
 }
 
@@ -33,12 +47,15 @@ class Zombie extends Unit {
     return Math.sqrt(x ** 2 + y ** 2);
   }
   getDirection(unit) {
-    const x = unit.x - this.x;
-    const y = unit.y - this.y;
-    const distance = this.getDistance(unit)
-    this.direction.x = x / distance;
-    this.direction.y = y / distance;
+    if (unit !== null) {
+      const x = unit.x - this.x;
+      const y = unit.y - this.y;
+      const distance = this.getDistance(unit)
+      this.direction.x = x / distance;
+      this.direction.y = y / distance;
+    }
   }
+
   checkCollision(unit) {
     if (this.getDistance(unit) <= this.radius + unit.radius) {
       return true;
@@ -66,8 +83,8 @@ class Player extends Unit {
     if (this.weapon == 'gun') {
       const x = target.clientX - this.x;
       const y = target.clientY - this.y;
-      this.directionFacing.x = x / Math.sqrt(x**2 + y**2);
-      this.directionFacing.y = y / Math.sqrt(x**2 + y**2);
+      this.directionFacing.x = x / Math.sqrt(x ** 2 + y ** 2);
+      this.directionFacing.y = y / Math.sqrt(x ** 2 + y ** 2);
     }
   }
   attack() {

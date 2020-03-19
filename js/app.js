@@ -5,24 +5,50 @@ const app = {
   ctx: null,
   timerID: null,
   timer: 0,
-  positions: [],
 
-  initializePlayer() {
-    const player = new Player(400, 400, 2, 10, 'gun');
+  initializePlayer(weapon) {
+    const player = new Player(400, 400, 2, 10, weapon);
     this.players.push(player);
   },
   startTimer() {
     this.timerID = setInterval(() => {
       if (this.timer % 5 == 2) {
-        const x = Math.floor(Math.random() * 980) + 10;
-        const y = Math.floor(Math.random() * 780) + 10;
-        this.createZombie(x, y);
-        const i = Math.floor(Math.random() * 980) + 10;
-        const j = Math.floor(Math.random() * 780) + 10;
-        this.createCitizen(i, j);
+        const location = this.spawnZoneZombie();
+        this.createZombie(location.i, location.j);
+      }
+      if (this.timer % 7 == 1) {
+        const location = this.spawnZoneCitizen(this.timer % 2);
+        this.createCitizen(location.x, location.y);
       }
       this.timer++;
     }, 1000);
+  },
+  spawnZoneZombie() {
+    let x = Math.floor(Math.random() * 980) + 10;
+    let y = Math.floor(Math.random() * 780) + 10;
+    while ((x >= 200 && x < 400 && y >= 500 && y < 600) || (x >= 600 && x < 800 && y >= 200 && y < 300)) {
+      x = Math.floor(Math.random() * 980) + 10;
+      y = Math.floor(Math.random() * 780) + 10;
+    }
+    return {
+      i: x,
+      j: y
+    }
+  },
+  spawnZoneCitizen(n) {
+    let i;
+    let j;
+    if (n == 0) {
+      i = Math.floor(Math.random() * 200) + 200;
+      j = Math.floor(Math.random() * 100) + 500;
+    } else {
+      i = Math.floor(Math.random() * 200) + 600;
+      j = Math.floor(Math.random() * 100) + 200;
+    }
+    return {
+      x: i,
+      y: j
+    }
   },
   createCanvas() {
     const convas = document.createElement('canvas');
@@ -64,6 +90,17 @@ const app = {
       if (distance > zombie.getDistance(citizen)) {
         distance = zombie.getDirection(citizen);
         unit = citizen;
+      }
+    }
+    return unit;
+  },
+  getClosestZombie(citizen) {
+    let distance = Number.POSITIVE_INFINITY;
+    let unit = null;
+    for (zombie of this.zombies) {
+      if (distance > citizen.getDistance(citizen)) {
+        distance = citizen.getDistance(zombie);
+        unit = zombie;
       }
     }
     return unit;
@@ -121,7 +158,7 @@ const app = {
     }
     for (citizen of app.citizens) {
       app.spawnUnit(citizen);
-      citizen.setDirection();
+      citizen.setDirection(app.getClosestZombie(citizen));
       citizen.move();
     }
     window.requestAnimationFrame(app.animate);
@@ -131,16 +168,16 @@ const app = {
 document.addEventListener('keydown', (event) => {
   if (event.keyCode == 39) {
     app.players[0].direction.x = 1;
-    app.players[0].setDirectionFacing();
+    app.players[0].setDirectionFacing(event);
   } else if (event.keyCode == 37) {
     app.players[0].direction.x = -1;
-    app.players[0].setDirectionFacing();
+    app.players[0].setDirectionFacing(event);
   } else if (event.keyCode == 38) {
     app.players[0].direction.y = -1;
-    app.players[0].setDirectionFacing();
+    app.players[0].setDirectionFacing(event);
   } else if (event.keyCode == 40) {
     app.players[0].direction.y = 1;
-    app.players[0].setDirectionFacing();
+    app.players[0].setDirectionFacing(event);
   }
 })
 document.addEventListener('keyup', (event) => {
