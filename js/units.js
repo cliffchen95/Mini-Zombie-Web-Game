@@ -58,15 +58,21 @@ class Player extends Unit {
     super(x, y, speed, radius);
     this.weapon = weapon;
   }
-  setDirectionFacing() {
+  setDirectionFacing(target) {
     if (this.weapon == 'sword') {
       this.directionFacing.x = this.direction.x / Math.sqrt(this.direction.x ** 2 + this.direction.y ** 2);
       this.directionFacing.y = this.direction.y / Math.sqrt(this.direction.x ** 2 + this.direction.y ** 2);
     }
+    if (this.weapon == 'gun') {
+      const x = target.clientX - this.x;
+      const y = target.clientY - this.y;
+      this.directionFacing.x = x / Math.sqrt(x**2 + y**2);
+      this.directionFacing.y = y / Math.sqrt(x**2 + y**2);
+    }
   }
   attack() {
     if (this.weapon == 'sword') {
-      
+
     }
   }
 }

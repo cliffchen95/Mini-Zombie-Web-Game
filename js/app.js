@@ -8,7 +8,7 @@ const app = {
   positions: [],
 
   initializePlayer() {
-    const player = new Player(400, 400, 2, 10, 'sword');
+    const player = new Player(400, 400, 2, 10, 'gun');
     this.players.push(player);
   },
   startTimer() {
@@ -154,8 +154,11 @@ document.addEventListener('keyup', (event) => {
     app.players[0].direction.y = 0;
   }
 })
-
-
+document.addEventListener('mousemove', (event) => {
+  if (app.players[0]) {
+    app.players[0].setDirectionFacing(event);
+  }
+})
 // app.initializePlayer();
 // app.createCanvas();
 // app.startTimer();
