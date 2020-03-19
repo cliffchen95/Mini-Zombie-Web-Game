@@ -49,17 +49,24 @@ class Zombie extends Unit {
 }
 
 class Player extends Unit {
-  color = 'yellow'
+  color = 'yellow';
+  directionFacing = {
+    x: 1,
+    y: 0
+  }
   constructor(x, y, speed, radius, weapon) {
     super(x, y, speed, radius);
     this.weapon = weapon;
   }
-  getDirection() {
-    const x = this.direction.x / Math.sqrt(this.direction.x + this.direction.y);
-    const y = this.direction.y / Math.sqrt(this.direction.x + this.direction.y);
-    return [
-      x: x,
-      y: y
-    ]
+  setDirectionFacing() {
+    if (this.weapon == 'sword') {
+      this.directionFacing.x = this.direction.x / Math.sqrt(this.direction.x ** 2 + this.direction.y ** 2);
+      this.directionFacing.y = this.direction.y / Math.sqrt(this.direction.x ** 2 + this.direction.y ** 2);
+    }
+  }
+  attack() {
+    if (this.weapon == 'sword') {
+      
+    }
   }
 }

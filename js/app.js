@@ -78,17 +78,30 @@ const app = {
     }
   },
   displayWeapon(player) {
-    const direction = player.getDirection();
+    const direction = player.directionFacing;
     if (player.weapon == 'sword') {
+      this.ctx.lineWidth = 3;
       this.ctx.beginPath();
-      this.ctx.moveTo(player.x + direction.x * 12, player.y + direction.y * 12);
-      this.ctx.lineTo(player.x + direction.x * 22, player.y + direction.y * 12);
+      this.ctx.moveTo(player.x + direction.x * 14, player.y + direction.y * 14);
+      this.ctx.lineTo(player.x + direction.x * 42, player.y + direction.y * 42);
       this.ctx.stroke();
     }
     if (player.weapon == 'gun') {
-
+      this.ctx.lineWidth = 5;
+      this.ctx.beginPath();
+      this.ctx.moveTo(player.x + direction.x * 14, player.y + direction.y * 14);
+      this.ctx.lineTo(player.x + direction.x * 25, player.y + direction.y * 25);
+      this.ctx.moveTo(player.x + direction.x * 14, player.y + direction.y * 14);
+      if (direction.x == 0) {
+        this.ctx.lineTo(player.x + direction.x * 14 + direction.y * 10, player.y + direction.y * 14);
+      } else if (direction.y == 0) {
+        this.ctx.lineTo(player.x + direction.x * 14, player.y + direction.y * 14 + direction.x * 10);
+      } else {
+        this.ctx.lineTo(player.x + direction.x * 14 - direction.y * 10, player.y + direction.y * 14 + direction.x * 14);
+      }
+      this.ctx.stroke();
     }
-  }
+  },
   animate() {
     app.clearCanvas();
     app.ctx.beginPath();
@@ -97,6 +110,7 @@ const app = {
     app.ctx.fillText(`Time to Daylight: ${app.timer}`, 700, 30)
     for (player of app.players) {
       app.spawnUnit(player);
+      app.displayWeapon(player);
       player.move();
     }
     for (zombie of app.zombies) {
@@ -117,12 +131,16 @@ const app = {
 document.addEventListener('keydown', (event) => {
   if (event.keyCode == 39) {
     app.players[0].direction.x = 1;
+    app.players[0].setDirectionFacing();
   } else if (event.keyCode == 37) {
     app.players[0].direction.x = -1;
+    app.players[0].setDirectionFacing();
   } else if (event.keyCode == 38) {
     app.players[0].direction.y = -1;
+    app.players[0].setDirectionFacing();
   } else if (event.keyCode == 40) {
     app.players[0].direction.y = 1;
+    app.players[0].setDirectionFacing();
   }
 })
 document.addEventListener('keyup', (event) => {
