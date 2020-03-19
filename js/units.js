@@ -50,4 +50,16 @@ class Zombie extends Unit {
 
 class Player extends Unit {
   color = 'yellow'
+  constructor(x, y, speed, radius, weapon) {
+    super(x, y, speed, radius);
+    this.weapon = weapon;
+  }
+  getDirection() {
+    const x = this.direction.x / Math.sqrt(this.direction.x + this.direction.y);
+    const y = this.direction.y / Math.sqrt(this.direction.x + this.direction.y);
+    return [
+      x: x,
+      y: y
+    ]
+  }
 }

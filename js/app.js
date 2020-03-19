@@ -8,7 +8,7 @@ const app = {
   positions: [],
 
   initializePlayer() {
-    const player = new Player(400, 400, 2, 10);
+    const player = new Player(400, 400, 2, 10, 'sword');
     this.players.push(player);
   },
   startTimer() {
@@ -77,6 +77,18 @@ const app = {
       }
     }
   },
+  displayWeapon(player) {
+    const direction = player.getDirection();
+    if (player.weapon == 'sword') {
+      this.ctx.beginPath();
+      this.ctx.moveTo(player.x + direction.x * 12, player.y + direction.y * 12);
+      this.ctx.lineTo(player.x + direction.x * 22, player.y + direction.y * 12);
+      this.ctx.stroke();
+    }
+    if (player.weapon == 'gun') {
+
+    }
+  }
   animate() {
     app.clearCanvas();
     app.ctx.beginPath();
