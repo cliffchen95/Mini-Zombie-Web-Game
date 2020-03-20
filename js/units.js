@@ -96,10 +96,12 @@ class Player extends Unit {
 
 class Bullet {
   speed = 5;
+  atMaxRange = false;
   constructor(position, direction, range) {
     this.position = position;
     this.direction = direction;
     this.range = range;
+    this.maxRange = this.maxRange(position, direction, range)
   }
   hit(unit) {
     if (this.position.x >= unit.x - unit.radius && this.position.y <= unit.x + unit.radius && this.position.y >= unit.y - unit.radius && this.position.y >= unit.y + unit.radius) {
@@ -107,20 +109,20 @@ class Bullet {
     }
     return null;
   }
-  maxRange() {
+  maxRange(position, direction, range) {
     const maxRange = {
-      x: this.position.x + this.direction.x * this.range,
-      y: this.position.y + this.direction.y * this.range
+      x: position.x + direction.x * range,
+      y: position.y + direction.y * range
     }
+    console.log(maxRange);
     return maxRange;
   }
   move() {
-    const maxRange = this.maxRange();
-    if (this.x + this.speed * this.direction.x <= maxRange.x) {
-      this.x += this.speed * this.direction.x;
-    }
-    if (this.y + this.speed * this.direction.y <= maxRange.y) {
-      this.y += this.speed * this.direction.y;
+    this.position.x += this.speed * this.direction.x;
+    this.position.y += this.speed * this.direction.y;
+    if (Math.floor(this.position.x) == Math.floor(this.maxRange.x) && Math.floor(this.position.y) == Math.floor(this.maxRange.y)) {
+      this.atMaxRange = true;
+      console.log('reached maxRange')
     }
   }
 }

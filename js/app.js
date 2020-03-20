@@ -6,8 +6,9 @@ const app = {
   ctx: null,
   timerID: null,
   timer: 0,
+  hasGun: false,
   gun: {
-    range: 0,
+    range: 300,
     damage: 0,
     position: {x:0, y:0},
     direction: {x:0, y:0},
@@ -32,6 +33,8 @@ const app = {
     const player = new Player(x, y, 2, 10, weapon);
     if (weapon == 'gun') {
       player['gun'] = this.gun;
+      this.hasGun = true;
+      player.hasGun = true;
     } else {
       player['sword'] = this.sword;
     }
@@ -152,6 +155,9 @@ const app = {
     }
     if (player.weapon == 'gun') {
       this.ctx.lineWidth = 5;
+      player.gun.position.x = player.x + direction.x * 30;
+      player.gun.position.y = player.y + direction.y * 30;
+      player.gun.direction = direction;
       this.ctx.beginPath();
       this.ctx.moveTo(player.x + direction.x * 14, player.y + direction.y * 14);
       this.ctx.lineTo(player.x + direction.x * 30, player.y + direction.y * 30);
@@ -166,6 +172,12 @@ const app = {
       this.ctx.stroke();
     }
   },
+  drawBullet(bullet) {
+    this.ctx.beginPath();
+    this.ctx.arc(bullet.position.x, bullet.position.y, 2, 0, 2 * Math.PI);
+    this.ctx.fillStyle = 'black';
+    this.ctx.fill();
+  },
   animate() {
     app.clearCanvas();
     app.ctx.beginPath();
@@ -176,6 +188,15 @@ const app = {
       app.spawnUnit(player);
       app.displayWeapon(player);
       player.move();
+      if (player.hasGun) {
+        for (bullet of player.gun.bullets){
+          app.drawBullet(bullet);
+          bullet.move();
+          if(bullet.atMaxRange){
+            player.gun.bullets.shift();
+          }
+        }
+      }
     }
     for (zombie of app.zombies) {
       app.spawnUnit(zombie);
@@ -276,6 +297,14 @@ document.addEventListener('click', (event) => {
     app.createCanvas();
     app.startTimer();
     app.animate();
+  }
+  if (app.hasGun) {
+    for (player of app.players) {
+      if (player.hasGun) {
+        player.gun.fireBullet();
+        console.log(app)
+      }
+    }
   }
 })
 
