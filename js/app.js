@@ -1,4 +1,5 @@
 const app = {
+  numOfPlayer: 0,
   players: [],
   zombies: [],
   citizens: [],
@@ -7,7 +8,9 @@ const app = {
   timer: 0,
 
   initializePlayer(weapon) {
-    const player = new Player(400, 400, 2, 10, weapon);
+    const x = Math.random() * 50 + 400;
+    const y = Math.random() * 50 + 300;
+    const player = new Player(x, y, 2, 10, weapon);
     this.players.push(player);
   },
   startTimer() {
@@ -54,9 +57,9 @@ const app = {
     const convas = document.createElement('canvas');
     const body = document.querySelector('body');
     body.appendChild(convas);
-    convas.style.width = '1000px';
+    convas.style.width = '800px';
     convas.width = 1000;
-    convas.style.height = '800px';
+    convas.style.height = '600px';
     convas.height = 800;
     this.ctx = convas.getContext('2d');
   },
@@ -127,7 +130,7 @@ const app = {
       this.ctx.lineWidth = 5;
       this.ctx.beginPath();
       this.ctx.moveTo(player.x + direction.x * 14, player.y + direction.y * 14);
-      this.ctx.lineTo(player.x + direction.x * 25, player.y + direction.y * 25);
+      this.ctx.lineTo(player.x + direction.x * 30, player.y + direction.y * 30);
       this.ctx.moveTo(player.x + direction.x * 14, player.y + direction.y * 14);
       if (direction.x == 0) {
         this.ctx.lineTo(player.x + direction.x * 14 + direction.y * 10, player.y + direction.y * 14);
@@ -196,6 +199,62 @@ document.addEventListener('mousemove', (event) => {
     app.players[0].setDirectionFacing(event);
   }
 })
+
+document.addEventListener('click', (event) => {
+  const body = document.querySelector('body');
+  if (event.target.id == 'start-game') {
+    event.target.remove();
+    const onePlayer = document.createElement('button');
+    const twoPlayer = document.createElement('button');
+    onePlayer.innerText = 'one player';
+    twoPlayer.innerText = 'two players';
+    body.appendChild(onePlayer);
+    body.appendChild(twoPlayer);
+  }
+  if (event.target.innerText == 'one player') {
+    const buttons = document.querySelectorAll('button');
+    for (button of buttons) {
+      button.remove();
+    }
+    const sword = document.createElement('button');
+    const gun = document.createElement('button');
+    sword.innerText = 'sword';
+    gun.innerText = 'gun';
+    body.appendChild(sword);
+    body.appendChild(gun);
+    app.numOfPlayer = 1;
+  }
+  if (event.target.innerText == 'two players') {
+    const buttons = document.querySelectorAll('button');
+    for (button of buttons) {
+      button.remove();
+    }
+    const sword = document.createElement('button');
+    const gun = document.createElement('button');
+    sword.innerText = 'sword';
+    gun.innerText = 'gun';
+    body.appendChild(sword);
+    body.appendChild(gun);
+    app.numOfPlayer = 2;
+  }
+  if (event.target.innerText == 'gun' || event.target.innerText == 'sword') {
+    const weapons = ['gun', 'sword'];
+    app.initializePlayer(event.target.innerText);
+    if (app.numOfPlayer == 2) {
+      const index = weapons.indexOf(event.target.innerText);
+      weapons.splice(index, 1);
+      app.initializePlayer(weapons[0])
+    }
+    const buttons = document.querySelectorAll('button');
+    for (button of buttons) {
+      button.remove();
+    }
+    app.createCanvas();
+    app.startTimer();
+    app.animate();
+  }
+})
+
 // app.initializePlayer();
 // app.createCanvas();
 // app.startTimer();
