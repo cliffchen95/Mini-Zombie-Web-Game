@@ -103,18 +103,22 @@ class Bullet {
     this.range = range;
     this.maxRange = this.maxRange(position, direction, range)
   }
+  getDistance(unit) {
+    const x = this.position.x - unit.x
+    const y = this.position.y - unit.y
+    return Math.sqrt(x**2 + y**2)
+  }
   hit(unit) {
-    if (this.position.x >= unit.x - unit.radius && this.position.y <= unit.x + unit.radius && this.position.y >= unit.y - unit.radius && this.position.y >= unit.y + unit.radius) {
-      return unit
+    if (this.getDistance(unit) <= unit.radius){
+      return true;
     }
-    return null;
+    return false;
   }
   maxRange(position, direction, range) {
     const maxRange = {
       x: position.x + direction.x * range,
       y: position.y + direction.y * range
     }
-    console.log(maxRange);
     return maxRange;
   }
   move() {
@@ -122,7 +126,6 @@ class Bullet {
     this.position.y += this.speed * this.direction.y;
     if (Math.floor(this.position.x) == Math.floor(this.maxRange.x) && Math.floor(this.position.y) == Math.floor(this.maxRange.y)) {
       this.atMaxRange = true;
-      console.log('reached maxRange')
     }
   }
 }

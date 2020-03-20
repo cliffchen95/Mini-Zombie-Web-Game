@@ -10,11 +10,11 @@ const app = {
   gun: {
     range: 300,
     damage: 0,
-    position: {x:0, y:0},
-    direction: {x:0, y:0},
+    position: { x: 0, y: 0 },
+    direction: { x: 0, y: 0 },
     bullets: [],
     fireBullet() {
-      const bullet = new Bullet({x:this.position.x, y: this.position.y}, {x:this.direction.x, y:this.direction.y}, this.range);
+      const bullet = new Bullet({ x: this.position.x, y: this.position.y }, { x: this.direction.x, y: this.direction.y }, this.range);
       this.bullets.push(bullet);
     }
   },
@@ -22,10 +22,10 @@ const app = {
   sword: {
     range: 0,
     damage: 0,
-    position: [],
-    attack() {
-
-    }
+    direction: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
+    endPosition: { x: 0, y: 0 },
+    swing: 0
   },
   initializePlayer(weapon) {
     const x = Math.random() * 50 + 400;
@@ -148,9 +148,25 @@ const app = {
     const direction = player.directionFacing;
     if (player.weapon == 'sword') {
       this.ctx.lineWidth = 3;
+      const angle = Math.PI / 6;
+      player.sword.startPosition.x = player.x + direction.x * 12;
+      player.sword.startPosition.y = player.y + direction.y * 12;
+      if (player.sword.swing == 0) {
+        player.sword.endPosition.x = player.x + direction.x * 42;
+        player.sword.endPosition.y = player.y + direction.y * 42;
+      } else if (player.sword.swing == 1) {
+        player.sword.endPosition.x = player.x + direction.x * 42 + 15 * Math.sin(angle) * direction.y;
+        player.sword.endPosition.y = player.y + direction.y * 42 + 15 * Math.cos(angle) * direction.x;
+        player.sword.swing = 2;
+      } else if (player.sword.swing == 2) {
+        player.sword.endPosition.x = player.x + direction.x * 42 - 15 * Math.sin(angle) * direction.y;
+        player.sword.endPosition.y = player.y + direction.y * 42 - 15 * Math.cos(angle) * direction.x;
+        player.sword.swing = 0;
+      }
+      player.sword.direction = direction;
       this.ctx.beginPath();
-      this.ctx.moveTo(player.x + direction.x * 14, player.y + direction.y * 14);
-      this.ctx.lineTo(player.x + direction.x * 42, player.y + direction.y * 42);
+      this.ctx.moveTo(player.sword.startPosition.x, player.sword.startPosition.y);
+      this.ctx.lineTo(player.sword.endPosition.x, player.sword.endPosition.y);
       this.ctx.stroke();
     }
     if (player.weapon == 'gun') {
@@ -189,11 +205,19 @@ const app = {
       app.displayWeapon(player);
       player.move();
       if (player.hasGun) {
-        for (bullet of player.gun.bullets){
+        for (bullet of player.gun.bullets) {
           app.drawBullet(bullet);
           bullet.move();
-          if(bullet.atMaxRange){
+          if (bullet.atMaxRange) {
             player.gun.bullets.shift();
+          }
+          for (zombie of app.zombies) {
+            if (bullet.hit(zombie)) {
+              let index = app.zombies.indexOf(zombie);
+              app.zombies.splice(index, 1);
+              index = player.gun.bullets.indexOf(bullet);
+              player.gun.bullets.splice(index, 1);
+            }
           }
         }
       }
@@ -214,6 +238,7 @@ const app = {
 }
 
 document.addEventListener('keydown', (event) => {
+  app.players[0].direction = {x: 0, y: 0};
   if (event.keyCode == 39) {
     app.players[0].direction.x = 1;
     app.players[0].setDirectionFacing(event);
@@ -226,6 +251,9 @@ document.addEventListener('keydown', (event) => {
   } else if (event.keyCode == 40) {
     app.players[0].direction.y = 1;
     app.players[0].setDirectionFacing(event);
+  }
+  if (event.keyCode == 32) {
+    app.players[0].sword.swing = 1;
   }
 })
 document.addEventListener('keyup', (event) => {
@@ -302,7 +330,6 @@ document.addEventListener('click', (event) => {
     for (player of app.players) {
       if (player.hasGun) {
         player.gun.fireBullet();
-        console.log(app)
       }
     }
   }
