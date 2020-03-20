@@ -6,11 +6,35 @@ const app = {
   ctx: null,
   timerID: null,
   timer: 0,
+  gun: {
+    range: 0,
+    damage: 0,
+    position: {x:0, y:0},
+    direction: {x:0, y:0},
+    bullets: [],
+    fireBullet() {
+      const bullet = new Bullet({x:this.position.x, y: this.position.y}, {x:this.direction.x, y:this.direction.y}, this.range);
+      this.bullets.push(bullet);
+    }
+  },
 
+  sword: {
+    range: 0,
+    damage: 0,
+    position: [],
+    attack() {
+
+    }
+  },
   initializePlayer(weapon) {
     const x = Math.random() * 50 + 400;
     const y = Math.random() * 50 + 300;
     const player = new Player(x, y, 2, 10, weapon);
+    if (weapon == 'gun') {
+      player['gun'] = this.gun;
+    } else {
+      player['sword'] = this.sword;
+    }
     this.players.push(player);
   },
   startTimer() {
