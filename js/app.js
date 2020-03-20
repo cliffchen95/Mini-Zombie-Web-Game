@@ -220,6 +220,10 @@ const app = {
             }
           }
         }
+      } else {
+        if (player.sword.swing == 1) {
+          
+        }
       }
     }
     for (zombie of app.zombies) {
