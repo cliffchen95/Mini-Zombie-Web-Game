@@ -1,7 +1,9 @@
 body {
   background-color: lightpink;
+  text-align: center;
 }
 
 canvas {
   border: 2px solid black;
+  background-color: darkred;
 }

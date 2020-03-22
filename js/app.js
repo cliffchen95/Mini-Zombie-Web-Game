@@ -25,7 +25,23 @@ const app = {
     direction: { x: 0, y: 0 },
     startPosition: { x: 0, y: 0 },
     endPosition: { x: 0, y: 0 },
-    swing: 0
+    swing: 0,
+    attack(zombie) {
+      const distance1 = zombie.getDistance(this.startPosition);
+      const distance2 = zombie.getDistance(this.endPosition);
+      if (distance1 + distance2 <= zombie.radius + 60) {
+        app.removeZombie(zombie);
+        return true;
+      }
+    }
+  },
+  removeZombie(zombie) {
+    for (let i = 0; i < this.zombies.length; i++) {
+      if (this.zombies[i] == zombie) {
+        this.zombies.splice(i, 1);
+        break;
+      }
+    }
   },
   initializePlayer(weapon) {
     const x = Math.random() * 50 + 400;
@@ -36,6 +52,7 @@ const app = {
       this.hasGun = true;
       player.hasGun = true;
     } else {
+      player.hasGun = false;
       player['sword'] = this.sword;
     }
     this.players.push(player);
@@ -84,11 +101,16 @@ const app = {
     const convas = document.createElement('canvas');
     const body = document.querySelector('body');
     body.appendChild(convas);
-    convas.style.width = '800px';
+    convas.style.width = '100vh';
     convas.width = 1000;
-    convas.style.height = '600px';
+    convas.style.height = '80vh';
     convas.height = 800;
     this.ctx = convas.getContext('2d');
+  },
+  removeCanvas() {
+    const convas = document.querySelector('canvas');
+    const body = document.querySelector('body');
+    body.removeChild(convas);
   },
   clearCanvas() {
     app.ctx.clearRect(0, 0, 1000, 800);
@@ -144,6 +166,16 @@ const app = {
       }
     }
   },
+  playerAttacked(zombie) {
+    for (let i = 0; i < this.players.length; i++) {
+      if (zombie.checkCollision(this.players[i])) {
+        this.players.splice(i, 1);
+      }
+    }
+    if (this.players.length == 0) {
+      return true;
+    }
+  },
   displayWeapon(player) {
     const direction = player.directionFacing;
     if (player.weapon == 'sword') {
@@ -194,12 +226,29 @@ const app = {
     this.ctx.fillStyle = 'black';
     this.ctx.fill();
   },
+  displayScore() {
+    this.ctx.beginPath();
+    this.ctx.font = '20px serif';
+    this.ctx.fillStyle = '#000000';
+    for (let i = 0; i < this.players.length; i++) {
+      app.ctx.fillText(`P${i+1}: ${this.players[i].score}`, 100, 30 + 20 * i);
+    }
+  },
+  displayTimer() {
+    this.ctx.beginPath();
+    this.ctx.font = '30px serif';
+    this.ctx.fillStyle = '#0000000'
+    this.ctx.fillText(`Time to Daylight: ${this.timer}`, 700, 30);
+  },
+  gameOver() {
+    this.removeCanvas();
+    const gameover = document.createElement('h2');
+    const body = document.querySelector('body');
+    body.appendChild(gameover);
+    gameover.innerText = "GAME OVER!"
+  },
   animate() {
     app.clearCanvas();
-    app.ctx.beginPath();
-    app.ctx.font = '30px serif';
-    app.ctx.fillStyle = '#ffffff'
-    app.ctx.fillText(`Time to Daylight: ${app.timer}`, 700, 30)
     for (player of app.players) {
       app.spawnUnit(player);
       app.displayWeapon(player);
@@ -213,16 +262,20 @@ const app = {
           }
           for (zombie of app.zombies) {
             if (bullet.hit(zombie)) {
-              let index = app.zombies.indexOf(zombie);
-              app.zombies.splice(index, 1);
+              app.removeZombie(zombie);
+              player.score += 1;
               index = player.gun.bullets.indexOf(bullet);
               player.gun.bullets.splice(index, 1);
             }
           }
         }
       } else {
-        if (player.sword.swing == 1) {
-          
+        if (player.sword.swing == 2) {
+          for (zombie of app.zombies) {
+            if (player.sword.attack(zombie)) {
+              player.score += 1;
+            }
+          }
         }
       }
     }
@@ -231,33 +284,96 @@ const app = {
       zombie.getDirection(app.getClosestUnit(zombie));
       zombie.move();
       app.citizenAttacked(zombie);
+      if (app.playerAttacked(zombie)) {
+        app.gameOver();
+      }
     }
     for (citizen of app.citizens) {
       app.spawnUnit(citizen);
       citizen.setDirection(app.getClosestZombie(citizen));
       citizen.move();
     }
+    app.displayTimer();
+    app.displayScore();
     window.requestAnimationFrame(app.animate);
   }
 }
 
 document.addEventListener('keydown', (event) => {
-  app.players[0].direction = {x: 0, y: 0};
+
   if (event.keyCode == 39) {
+    if (!app.players[0].hasGun) {
+      app.players[0].direction = { x: 0, y: 0 };
+    }
     app.players[0].direction.x = 1;
-    app.players[0].setDirectionFacing(event);
+    if (!app.players[0].hasGun) {
+      app.players[0].setDirectionFacing(event);
+    }
   } else if (event.keyCode == 37) {
+    if (!app.players[0].hasGun) {
+      app.players[0].direction = { x: 0, y: 0 };
+    }
     app.players[0].direction.x = -1;
-    app.players[0].setDirectionFacing(event);
+    if (!app.players[0].hasGun) {
+      app.players[0].setDirectionFacing(event);
+    }
   } else if (event.keyCode == 38) {
+    if (!app.players[0].hasGun) {
+      app.players[0].direction = { x: 0, y: 0 };
+    }
     app.players[0].direction.y = -1;
-    app.players[0].setDirectionFacing(event);
+    if (!app.players[0].hasGun) {
+      app.players[0].setDirectionFacing(event);
+    }
   } else if (event.keyCode == 40) {
+    if (!app.players[0].hasGun) {
+      app.players[0].direction = { x: 0, y: 0 };
+    }
     app.players[0].direction.y = 1;
-    app.players[0].setDirectionFacing(event);
+    if (!app.players[0].hasGun) {
+      app.players[0].setDirectionFacing(event);
+    }
+  }
+
+  if (event.keyCode == 68) {
+    if (!app.players[1].hasGun) {
+      app.players[1].direction = { x: 0, y: 0 };
+    }
+    app.players[1].direction.x = 1;
+    if (!app.players[1].hasGun) {
+      app.players[1].setDirectionFacing(event);
+    }
+  } else if (event.keyCode == 65) {
+    if (!app.players[1].hasGun) {
+      app.players[1].direction = { x: 0, y: 0 };
+    }
+    app.players[1].direction.x = -1;
+    if (!app.players[1].hasGun) {
+      app.players[1].setDirectionFacing(event);
+    }
+  } else if (event.keyCode == 87) {
+    if (!app.players[1].hasGun) {
+      app.players[1].direction = { x: 0, y: 0 };
+    }
+    app.players[1].direction.y = -1;
+    if (!app.players[1].hasGun) {
+      app.players[1].setDirectionFacing(event);
+    }
+  } else if (event.keyCode == 83) {
+    if (!app.players[1].hasGun) {
+      app.players[1].direction = { x: 0, y: 0 };
+    }
+    app.players[1].direction.y = 1;
+    if (!app.players[1].hasGun) {
+      app.players[1].setDirectionFacing(event);
+    }
   }
   if (event.keyCode == 32) {
-    app.players[0].sword.swing = 1;
+    for (player of app.players) {
+      if (!player.hasGun) {
+        player.sword.swing = 1;
+      }
+    }
   }
 })
 document.addEventListener('keyup', (event) => {
@@ -270,10 +386,22 @@ document.addEventListener('keyup', (event) => {
   } else if (event.keyCode == 40) {
     app.players[0].direction.y = 0;
   }
+
+  if (event.keyCode == 68) {
+    app.players[1].direction.x = 0;
+  } else if (event.keyCode == 65) {
+    app.players[1].direction.x = 0;
+  } else if (event.keyCode == 87) {
+    app.players[1].direction.y = 0;
+  } else if (event.keyCode == 83) {
+    app.players[1].direction.y = 0;
+  }
 })
 document.addEventListener('mousemove', (event) => {
-  if (app.players[0]) {
-    app.players[0].setDirectionFacing(event);
+  for (player of app.players) {
+    if (player.hasGun) {
+      player.setDirectionFacing(event);
+    }
   }
 })
 

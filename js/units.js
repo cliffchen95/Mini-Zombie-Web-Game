@@ -67,6 +67,7 @@ class Zombie extends Unit {
 
 class Player extends Unit {
   color = 'yellow';
+  score = 0;
   directionFacing = {
     x: 1,
     y: 0
