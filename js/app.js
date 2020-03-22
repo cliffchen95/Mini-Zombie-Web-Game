@@ -7,6 +7,7 @@ const app = {
   timerID: null,
   timer: 0,
   hasGun: false,
+  timeToSurvive: 100,
   gun: {
     range: 300,
     damage: 0,
@@ -68,7 +69,14 @@ const app = {
         this.createCitizen(location.x, location.y);
       }
       this.timer++;
+      if (this.timer == this.timeToSurvive) {
+        this.stopTimer();
+        this.victory();
+      }
     }, 1000);
+  },
+  stopTimer() {
+    clearInterval(this.timerID);
   },
   spawnZoneZombie() {
     let x = Math.floor(Math.random() * 980) + 10;
@@ -238,7 +246,7 @@ const app = {
     this.ctx.beginPath();
     this.ctx.font = '30px serif';
     this.ctx.fillStyle = '#0000000'
-    this.ctx.fillText(`Time to Daylight: ${this.timer}`, 700, 30);
+    this.ctx.fillText(`Time to Daylight: ${this.timeToSurvive - this.timer}`, 700, 30);
   },
   gameOver() {
     this.removeCanvas();
@@ -246,6 +254,13 @@ const app = {
     const body = document.querySelector('body');
     body.appendChild(gameover);
     gameover.innerText = "GAME OVER!"
+  },
+  victory() {
+    this.removeCanvas();
+    const gameover = document.createElement('h2');
+    const body = document.querySelector('body');
+    body.appendChild(gameover);
+    gameover.innerText = "Victory!"
   },
   animate() {
     app.clearCanvas();
