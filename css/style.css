@@ -16,3 +16,13 @@ button {
     font-size: 1.3em;
     border-radius: 5px;
 }
+
+div {
+    margin-right: 3%;
+}
+
+#display {
+    display:flex;
+    margin: 1%;
+    margin-left: 2%;
+}

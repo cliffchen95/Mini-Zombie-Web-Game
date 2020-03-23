@@ -107,8 +107,8 @@ const app = {
   },
   createCanvas() {
     const convas = document.createElement('canvas');
-    const body = document.querySelector('body');
-    body.appendChild(convas);
+    const div = document.querySelector('div');
+    div.appendChild(convas);
     convas.style.width = '100vh';
     convas.width = 1000;
     convas.style.height = '80vh';
@@ -119,6 +119,32 @@ const app = {
     const convas = document.querySelector('canvas');
     const body = document.querySelector('body');
     body.removeChild(convas);
+  },
+  displayInstruction() {
+    const div = document.querySelector('#instruction');
+    const p1 = document.createElement('p');
+    p1.innerText = 'p1 uses arrow keys to control';
+    const arrowKeyImage = new Image(100,100);
+    arrowKeyImage.src = 'images/arrowkey.png';
+    div.appendChild(p1);
+    div.appendChild(arrowKeyImage);
+    if(this.players.length > 1) {
+      const p2 = document.createElement('p');
+      p2.innerText = 'p2 uses wasd keys to control';
+      const wasdKeyImage = new Image(100,100);
+      wasdKeyImage.src = 'images/wasd-keys.png';
+      div.appendChild(p2);
+      div.appendChild(wasdKeyImage);
+    }
+    const p3 = document.createElement('p');
+    p3.innerText = 'sword: space bar to hit, gun: left click to fire';
+    const spacebar = new Image(100,100);
+    spacebar.src = 'images/space-bar.png';
+    const leftclick = new Image(100, 100);
+    leftclick.src = 'images/leftclick.png';
+    div.appendChild(p3);
+    div.appendChild(spacebar);
+    div.appendChild(leftclick);
   },
   clearCanvas() {
     app.ctx.clearRect(0, 0, 1000, 800);
@@ -258,8 +284,8 @@ const app = {
   victory() {
     this.removeCanvas();
     const gameover = document.createElement('h2');
-    const body = document.querySelector('body');
-    body.appendChild(gameover);
+    const div = document.querySelector('div');
+    div.appendChild(gameover);
     gameover.innerText = "Victory!"
   },
   animate() {
@@ -469,6 +495,7 @@ document.addEventListener('click', (event) => {
     for (button of buttons) {
       button.remove();
     }
+    app.displayInstruction();
     app.createCanvas();
     app.startTimer();
     app.animate();
