@@ -26,3 +26,7 @@ characters:
 ![Image](images/characters.jpeg)
 gameboard:
 ![Image](images/gameboard.jpeg)
+
+result:
+----------
+![Image](images/result.png)
